@@ -21,14 +21,18 @@ class MoodModel with ChangeNotifier {
     'Excited': 0
   };
 
+  final List<String> _hist = [];
+
   String get currentMood => _currentMood;
   Color get backgroundColor => _backgroundColor;
   Map<String, int> get moodCount =>_moodCount;
+  List<String> get hist => _hist;
 
   void setHappy() {
     _currentMood = 'assets/happy_bee.jpg';
     _backgroundColor = Colors.yellow;
     _moodCount['Happy'] = _moodCount['Happy']! + 1;
+    recHist('Happy 😊');
     notifyListeners();
   }
 
@@ -36,6 +40,7 @@ class MoodModel with ChangeNotifier {
     _currentMood = 'assets/sad_bee.jpg';
     _backgroundColor = Colors.blue;
     _moodCount['Sad'] = _moodCount['Sad']! + 1;
+    recHist('Sad 😢');
     notifyListeners();
   }
 
@@ -43,7 +48,15 @@ class MoodModel with ChangeNotifier {
     _currentMood = 'assets/excited.jpg';
     _backgroundColor = Colors.orange;
     _moodCount['Excited'] = _moodCount['Excited']! + 1;
+    recHist('Excited 🎉');
     notifyListeners();
+  }
+
+  void recHist(String mood) {
+    _hist.add(mood);
+    if (_hist.length > 3) {
+      _hist.removeAt(0);
+    }
   }
 }
 
@@ -78,7 +91,9 @@ class HomePage extends StatelessWidget {
                 SizedBox(height: 50),
                 MoodButtons(),
                 SizedBox(height: 10),
-                MoodCounter()
+                MoodCounter(),
+                SizedBox(height: 30),
+                MoodHistory()
               ],
             ),
           )
@@ -150,6 +165,33 @@ class MoodCounter extends StatelessWidget {
             Text('${count['Sad']}'),
 
             Text('${count['Excited']}'),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class MoodHistory extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MoodModel>(
+      builder: (context, moodModel, child) {
+        final hist = moodModel.hist;
+
+        if (hist.isEmpty) {
+          return Text(
+            "No history yet",
+            style: TextStyle(fontStyle: FontStyle.italic),
+          );
+        }
+
+        return Column(
+          children: [
+            Text("Last 3 Moods:", style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            for (var mood in hist.reversed)
+              Text(mood, style: TextStyle(fontSize: 16)),
           ],
         );
       },
