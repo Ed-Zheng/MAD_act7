@@ -15,24 +15,34 @@ class MoodModel with ChangeNotifier {
   String _currentMood = 'assets/happy_bee.jpg';
   Color _backgroundColor = Colors.yellow;
 
+  final Map<String, int> _moodCount = {
+    'Happy': 0,
+    'Sad': 0,
+    'Excited': 0
+  };
+
   String get currentMood => _currentMood;
   Color get backgroundColor => _backgroundColor;
+  Map<String, int> get moodCount =>_moodCount;
 
   void setHappy() {
     _currentMood = 'assets/happy_bee.jpg';
     _backgroundColor = Colors.yellow;
+    _moodCount['Happy'] = _moodCount['Happy']! + 1;
     notifyListeners();
   }
 
   void setSad() {
     _currentMood = 'assets/sad_bee.jpg';
     _backgroundColor = Colors.blue;
+    _moodCount['Sad'] = _moodCount['Sad']! + 1;
     notifyListeners();
   }
 
   void setExcited() {
     _currentMood = 'assets/excited.jpg';
     _backgroundColor = Colors.orange;
+    _moodCount['Excited'] = _moodCount['Excited']! + 1;
     notifyListeners();
   }
 }
@@ -67,6 +77,8 @@ class HomePage extends StatelessWidget {
                 MoodDisplay(),
                 SizedBox(height: 50),
                 MoodButtons(),
+                SizedBox(height: 10),
+                MoodCounter()
               ],
             ),
           )
@@ -119,6 +131,28 @@ class MoodButtons extends StatelessWidget {
           child: Text('Excited 🎉'),
         ),
       ],
+    );
+  }
+}
+
+class MoodCounter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MoodModel>(
+      builder: (context, moodModel, child) {
+        final count = moodModel.moodCount;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+
+            Text('${count['Happy']}'),
+
+            Text('${count['Sad']}'),
+
+            Text('${count['Excited']}'),
+          ],
+        );
+      },
     );
   }
 }
